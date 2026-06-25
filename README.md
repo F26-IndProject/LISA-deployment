@@ -111,6 +111,7 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 sudo apt install -y docker-compose-plugin
 exit
+Logout and login again
 ```
 
 Log back in, then verify:
