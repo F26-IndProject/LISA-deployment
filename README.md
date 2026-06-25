@@ -88,15 +88,15 @@ docker exec -i lisa_postgres_quick psql -U $POSTGRES_USER -d $POSTGRES_DB < lisa
 
 ### 6. Start the Frontend
 
-Open a new terminal and run:
+Open a new terminal, ensuring that you're in the LISA-deployment directory and run:
 
 ```bash
-cd LISA-deployment/frontend/frontend
+cd frontend/frontend
 npm install
 npm run dev
 ```
 
-The frontend will be available at `http://<SERVER_IP>:3000`.
+The frontend will be available at `http://localhost:3000`.
 
 ---
 
