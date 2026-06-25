@@ -2,6 +2,8 @@ services:
   lisa_postgres_quick:
     image: postgres:15-alpine
     container_name: lisa_postgres_quick
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -23,9 +25,11 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: lisa_backend
+    env_file:
+      - .env
     environment:
       DATABASE_URL: ${DATABASE_URL}
-      CORS_ORIGINS: ${CORS_ORIGINS}
+      CORS_ORIGINS: "http://localhost:3000,http://${SERVER_IP}:3000"
     ports:
       - "8000:8000"
     depends_on:

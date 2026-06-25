@@ -9,29 +9,19 @@ If your network scheme is different, update only the `SERVER_IP` value in the `.
 
 ---
 
-## On the LISA Server
+## Prerequisites
 
-### 1. Install Docker
+- Docker
+- Docker Compose
+- Node.js (includes npm)
 
-```bash
-# Install Docker the official way (the version in Ubuntu's repos is outdated)
-curl -fsSL https://get.docker.com | sudo sh
-
-# Add yourself to the docker group so you don't need sudo for every command
-sudo usermod -aG docker $USER
-
-# Install Docker Compose
-sudo apt install -y docker-compose-plugin
-
-# Verify installation
-docker compose version
-```
-
-> **Note:** Log out and back in after adding yourself to the docker group for the changes to take effect.
+> See [Installing Prerequisites](#installing-prerequisites) at the bottom of this guide.
 
 ---
 
-### 2. Clone the LISA Deployment Repository
+## On the LISA Server
+
+### 1. Clone the LISA Deployment Repository
 
 ```bash
 git clone https://github.com/F26-IndProject/LISA-deployment.git
@@ -42,9 +32,7 @@ cd LISA-deployment
 
 ---
 
-### 3. Configure the Environment File
-
-Fill in your values in the `.env` file:
+### 2. Configure the Environment File
 
 ```bash
 nano .env
@@ -52,7 +40,7 @@ nano .env
 
 ---
 
-### 4. Clone the Backend and Frontend Repositories
+### 3. Clone the Backend and Frontend Repositories
 
 ```bash
 git clone https://github.com/F26-IndProject/backend.git
@@ -61,23 +49,36 @@ git clone https://github.com/F26-IndProject/frontend.git
 
 ---
 
-### 5. Start Docker Compose
+### 4. Start Docker Compose
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
+
+> `--build` is required on the first run to build the backend image.
 
 ---
 
-### 6. Restore the Database Schema
+### 5. Restore the Database Schema and Seed Data
+
+First, load the environment variables:
+
+```bash
+export $(cat .env | grep -v '#' | xargs)
+```
+
+Restore the schema:
 
 ```bash
 docker exec -i lisa_postgres_quick psql -U $POSTGRES_USER -d $POSTGRES_DB < lisa_schema.sql
 ```
 
----
+> You may see the error below during restore — it is harmless:
+> ```
+> ERROR:  role "lisa" does not exist
+> ```
 
-### 7. Load the Seed Data
+Load the seed data:
 
 ```bash
 docker exec -i lisa_postgres_quick psql -U $POSTGRES_USER -d $POSTGRES_DB < lisa_seed.sql
@@ -85,14 +86,59 @@ docker exec -i lisa_postgres_quick psql -U $POSTGRES_USER -d $POSTGRES_DB < lisa
 
 ---
 
-### 8. Start the Frontend
+### 6. Start the Frontend
 
-Open a new terminal and make sure you're in the LISA-deployment directory and run:
+Open a new terminal and run:
 
 ```bash
-cd frontend/frontend
+cd LISA-deployment/frontend/frontend
 npm install
 npm run dev
 ```
 
-The frontend will be available at `http://localhost:3000`.
+The frontend will be available at `http://<SERVER_IP>:3000`.
+
+---
+
+## Installing Prerequisites
+
+### Docker
+
+```bash
+sudo systemctl stop packagekit
+curl -fsSL https://get.docker.com | sudo sh
+sudo groupadd docker
+sudo usermod -aG docker $USER
+sudo apt install -y docker-compose-plugin
+exit
+```
+
+Log back in, then verify:
+
+```bash
+docker compose version
+```
+
+**Common problems:**
+
+| Problem | Solution |
+|---------|----------|
+| `E: Could not get lock /var/lib/apt/lists/lock. It is held by process XXXX (packagekitd)` | Run `sudo systemctl stop packagekit` then retry |
+| `usermod: group 'docker' does not exist` | Run `sudo groupadd docker` first, then `sudo usermod -aG docker $USER` |
+
+---
+
+### Node.js
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+node -v
+npm -v
+```
+
+**Common problems:**
+
+| Problem | Solution |
+|---------|----------|
+| `E: Could not get lock /var/lib/dpkg/lock-frontend` | Run `sudo systemctl stop unattended-upgrades` then retry |
