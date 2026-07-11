@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict pfKKcOKyrNjwdWIJqh0zXawoos56JWc5VKLymCwSKpSZtB8VLaTRalCi4PIrhKW
+\restrict Iu3tIqAjckmXdTL61LhO8hcN1EEfx2ao4IOGz9c6Skde2jcrGJyybOB5FnZDSc9
 
 -- Dumped from database version 15.18
 -- Dumped by pg_dump version 15.18
@@ -59,7 +59,7 @@ SELECT pg_catalog.setval('public.agent_schedules_id_seq', 12, true);
 -- Name: break_times_id_seq; Type: SEQUENCE SET; Schema: public; Owner: lisa
 --
 
-SELECT pg_catalog.setval('public.break_times_id_seq', 7, true);
+SELECT pg_catalog.setval('public.break_times_id_seq', 8, true);
 
 
 --
@@ -73,5 +73,5 @@ SELECT pg_catalog.setval('public.public_holidays_id_seq', 6, true);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict pfKKcOKyrNjwdWIJqh0zXawoos56JWc5VKLymCwSKpSZtB8VLaTRalCi4PIrhKW
+\unrestrict Iu3tIqAjckmXdTL61LhO8hcN1EEfx2ao4IOGz9c6Skde2jcrGJyybOB5FnZDSc9
 

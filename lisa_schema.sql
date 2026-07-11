@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict XuoRyLYFsL68K12XvxjXBHQaqB2Dfc6TlgJCSEEnxfrMZtelgyIIAvJ2dWjvQGr
+\restrict W49VL0La7w4XJBGWkeG6uz9LorKdLPMU40biJraA9HXhfBN90Gh4f6EHhrsMLfL
 
 -- Dumped from database version 15.18
 -- Dumped by pg_dump version 15.18
@@ -101,6 +101,18 @@ ALTER TABLE public.agent_builds_id_seq OWNER TO lisa;
 
 ALTER SEQUENCE public.agent_builds_id_seq OWNED BY public.agent_builds.id;
 
+
+--
+-- Name: agent_deleted_crons; Type: TABLE; Schema: public; Owner: lisa
+--
+
+CREATE TABLE public.agent_deleted_crons (
+    agent_id character varying NOT NULL,
+    job_name character varying NOT NULL
+);
+
+
+ALTER TABLE public.agent_deleted_crons OWNER TO lisa;
 
 --
 -- Name: agent_deleted_tasks; Type: TABLE; Schema: public; Owner: lisa
@@ -282,7 +294,9 @@ CREATE TABLE public.agents (
     updated_at timestamp without time zone DEFAULT now(),
     agent_role character varying(20) DEFAULT 'user'::character varying,
     agent_schedule_id integer,
-    agent_break_id integer
+    agent_break_id integer,
+    activity_interval_min integer,
+    activity_interval_max integer
 );
 
 
@@ -656,6 +670,14 @@ ALTER TABLE ONLY public.agent_builds
 
 
 --
+-- Name: agent_deleted_crons agent_deleted_crons_pkey; Type: CONSTRAINT; Schema: public; Owner: lisa
+--
+
+ALTER TABLE ONLY public.agent_deleted_crons
+    ADD CONSTRAINT agent_deleted_crons_pkey PRIMARY KEY (agent_id, job_name);
+
+
+--
 -- Name: agent_deleted_tasks agent_deleted_tasks_agent_id_task_name_key; Type: CONSTRAINT; Schema: public; Owner: lisa
 --
 
@@ -929,5 +951,5 @@ ALTER TABLE ONLY public.behavior_templates
 -- PostgreSQL database dump complete
 --
 
-\unrestrict XuoRyLYFsL68K12XvxjXBHQaqB2Dfc6TlgJCSEEnxfrMZtelgyIIAvJ2dWjvQGr
+\unrestrict W49VL0La7w4XJBGWkeG6uz9LorKdLPMU40biJraA9HXhfBN90Gh4f6EHhrsMLfL
 

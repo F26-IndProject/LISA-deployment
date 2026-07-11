@@ -1,21 +1,13 @@
-# LISA Deployment Guide
-
-## Network Configuration
-
-**Recommended subnet:** `192.168.100.0/24`  
-**Server IP:** `192.168.100.10`
-
-If your network scheme is different, update only the `SERVER_IP` value in the `.env` file.
-
----
+# LISA Server Deployment Guide
 
 ## Prerequisites
 
+- Ubuntu 22.04
 - Docker
 - Docker Compose
 - Node.js (includes npm)
 
-> See [Installing Prerequisites](#installing-prerequisites) at the bottom of this guide.
+If any of the prerequisites is missing, the `install.sh` will detect it and install it automatically.
 
 ---
 
@@ -28,9 +20,7 @@ git clone https://github.com/F26-IndProject/LISA-deployment.git
 cd LISA-deployment
 ```
 
-> Stay in this directory — it contains the `docker-compose.yml` and `.env` files.
-
----
+Stay in this directory — it contains the `docker-compose.yml` and `.env` files.
 
 ### 2. Configure the Environment File
 
@@ -38,98 +28,58 @@ cd LISA-deployment
 nano .env
 ```
 
----
-
-### 3. Clone the Backend and Frontend Repositories
+### 3. Run the Installation Script
 
 ```bash
-git clone https://github.com/F26-IndProject/backend.git
-git clone https://github.com/F26-IndProject/frontend.git
+chmod +x install.sh && sudo ./install.sh
 ```
 
----
+The script will:
 
-### 4. Start Docker Compose
+- Check and install missing prerequisites
+- Clone the backend and frontend repositories
+- Start Docker Compose
+- Restore the database schema and seed data
+- Start the frontend
 
-```bash
-docker compose up -d --build
-```
-
-> `--build` is required on the first run to build the backend image.
-
----
-
-### 5. Restore the Database Schema and Seed Data
-
-First, load the environment variables:
-
-```bash
-export $(cat .env | grep -v '#' | xargs)
-```
-
-Restore the schema:
-
-```bash
-docker exec -i lisa_postgres_quick psql -U $POSTGRES_USER -d $POSTGRES_DB < lisa_schema.sql
-```
-
-> You may see the error below during restore — it is harmless:
-> ```
-> ERROR:  role "lisa" does not exist
-> ```
-
-Load the seed data:
-
-```bash
-docker exec -i lisa_postgres_quick psql -U $POSTGRES_USER -d $POSTGRES_DB < lisa_seed.sql
-```
-
----
-
-### 6. Start the Frontend
-
-Open a new terminal, ensuring that you're in the LISA-deployment directory and run:
-
-```bash
-cd frontend/frontend
-npm install
-npm run dev
-```
+This terminal will be taken by npm. Do not stop it — open another terminal and continue working.
 
 The frontend will be available at `http://localhost:3000`.
 
 ---
 
-## Installing Prerequisites
+## Installing Prerequisites (This is just reference. Installation has been automated with the script.) So you don't need to run this commands if installation was successful
 
-### Docker
+### Docker and Docker Compose
+
+Install dependencies:
 
 ```bash
-sudo systemctl stop packagekit
-curl -fsSL https://get.docker.com | sudo sh
-sudo groupadd docker
-sudo usermod -aG docker $USER
-sudo apt install -y docker-compose-plugin
-exit
-Logout and login again
+sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
 ```
 
-Log back in, then verify:
+Add Docker's GPG key, official repository and update system repository:
 
 ```bash
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker.gpg
+
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+Update the package list:
+
+```bash
+sudo apt update
+```
+
+Install Docker:
+
+```bash
+sudo apt install docker-ce docker-ce-cli containerd.io -y
 docker compose version
 ```
 
-**Common problems:**
-
-| Problem | Solution |
-|---------|----------|
-| `E: Could not get lock /var/lib/apt/lists/lock. It is held by process XXXX (packagekitd)` | Run `sudo systemctl stop packagekit` then retry |
-| `usermod: group 'docker' does not exist` | Run `sudo groupadd docker` first, then `sudo usermod -aG docker $USER` |
-
----
-
-### Node.js
+### Node.js and npm
 
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
@@ -137,9 +87,3 @@ sudo apt install -y nodejs
 node -v
 npm -v
 ```
-
-**Common problems:**
-
-| Problem | Solution |
-|---------|----------|
-| `E: Could not get lock /var/lib/dpkg/lock-frontend` | Run `sudo systemctl stop unattended-upgrades` then retry |
