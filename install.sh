@@ -87,8 +87,34 @@ docker exec -i lisa_postgres_quick psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" < 
 echo ""
 echo ""
 
-# ── 5. Install frontend dependencies ─────────────────────────────────────────
-echo "[5/6] Installing frontend dependencies..."
+# ── 5. Setup Samba share ─────────────────────────────────────────────────────
+echo "[5/7] Setting up Samba share..."
+if which smbd >/dev/null 2>&1; then
+    echo "Samba already installed — skipping"
+else
+    echo "Installing Samba..."
+    apt install samba -y
+    echo "Samba installed ✓"
+fi
+
+mkdir -p /srv/samba/share
+bash -c 'echo "Project notes - Q2 2026" > /srv/samba/share/readme.txt'
+bash -c 'echo "Team meeting at 14:00" > /srv/samba/share/notes.txt'
+bash -c 'echo "Server info: lisaserver" > /srv/samba/share/info.txt'
+
+chmod 1777 /srv/samba/share
+chown nobody:nogroup /srv/samba/share
+chmod 664 /srv/samba/share/*.txt
+chown nobody:nogroup /srv/samba/share/*.txt
+
+cp "$SCRIPT_DIR/smb.conf" /etc/samba/smb.conf
+
+systemctl restart smbd nmbd
+ufw allow samba
+echo "Samba share configured ✓"
+
+# ── 6. Install frontend dependencies ─────────────────────────────────────────
+echo "[6/7] Installing frontend dependencies..."
 if [ -d "$SCRIPT_DIR/frontend/frontend" ]; then
     cd "$SCRIPT_DIR/frontend/frontend"
 else
@@ -97,7 +123,7 @@ fi
 npm install
 
 # ── 6. Start frontend ─────────────────────────────────────────────────────────
-echo "[6/6] Starting frontend..."
+echo "[7/7] Starting frontend..."
 echo "Frontend will be available at: http://localhost:3000"
 echo "Press Ctrl+C to stop the frontend and 'npm run dev' to start it again."
 echo "Don't close this terminal. open a new one and continue otherwise the frontend will stop"

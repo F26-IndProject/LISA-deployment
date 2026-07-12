@@ -40,7 +40,20 @@ The script will:
 - Clone the backend and frontend repositories
 - Start Docker Compose
 - Restore the database schema and seed data
+- Set up the SMB share directory at `/srv/samba/share` with sample files
 - Start the frontend
+
+To test the SMB share from a Windows agent:
+
+```powershell
+dir \\LISA_SERVER_IP\share
+```
+
+From a Linux agent:
+
+```bash
+smbclient //LISA_SERVER_IP/share -N -c "ls"
+```
 
 This terminal will be taken by npm. Do not stop it — open another terminal and continue working.
 
